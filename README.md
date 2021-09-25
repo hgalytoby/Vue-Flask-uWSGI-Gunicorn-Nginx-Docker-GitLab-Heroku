@@ -9,7 +9,7 @@
 - 後端使用兩個 Flask 
 - uWSGI 與 Gunicorn 分別點啟 Flask
 - 利用 GitLab CI/CD Build Docker Image，並自動 Deploy 至 Heroku
-> [前往 Heroku 成果網址](https://cn.vitejs.dev/guide/#scaffolding-your-first-vite-project)
+> [前往 Heroku 成果網址](https://vue-python-nginx-gitlab-docker.herokuapp.com/)
 
 ## 事前準備
 - 1.安裝 Node.js
