@@ -402,7 +402,7 @@ server {
 }
 ```
 
-### 修改 Dockerfile (將原本 Docker 的改名自己留著參考)
+### 修改 Dockerfile (將原本 Dockerfile 改名留著參考)
 ```dockerfile
 FROM node:14 as vite-test
 WORKDIR /usr/src/app
