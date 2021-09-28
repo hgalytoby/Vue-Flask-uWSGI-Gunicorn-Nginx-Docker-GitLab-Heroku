@@ -1,12 +1,13 @@
-# Vue + Flask + uWSGI+ Gunicorn + Nginx + Docker + GitLab + Heroku + 全圖文解說
+# Vue + Flask + uWSGI + Gunicorn + Nginx + Docker + GitLab + Heroku + 全圖文解說
 
 # 請深呼吸保持良好精神，本教學文會很長，但別擔心!!我已經附上很多圖文解說!!跟著做保證成功!!
 
 ## 專案大綱
 - 使用 Docker 包所有套件
 - 使用 Nginx 實現反向代理兩個後端伺服器
+- 前後端分離
 - 前端使用 Vue3
-- 後端使用兩個 Flask 
+- 後端使用兩個 Flask，為了實現不同的後端如何代理 
 - uWSGI 與 Gunicorn 分別點啟 Flask
 - 利用 GitLab CI/CD Build Docker Image，並自動 Deploy 至 Heroku
 > [前往 Heroku 成果網址](https://vue-python-nginx-gitlab-docker.herokuapp.com/)
@@ -181,7 +182,7 @@ if __name__ == '__main__':
 
 
 ## 使用 Docker 
-### 第一步: 刪掉前端資料夾下的 node_modules
+### 第一步: 刪掉前端資料夾下的 node_modules (很重要!)
 
 ### 第二步: 在後端資料夾下新增 requirements.txt
 ```
@@ -201,7 +202,7 @@ chdir=/usr/src/app/backend
 enable-threads=True
 ```
 
-### 第四步: 在後端資料夾下新增 Run.sh (注意! 如果不是在 UNIX 下寫.sh 會出問題!!)
+### 第四步: 在後端資料夾下新增 Run.sh (注意! 如果不是在 UNIX 下編寫 .sh 會出問題!!)
 ```shell script
 #! /bin/bash
 
@@ -223,8 +224,6 @@ server {
     listen 48763 ;
     server_name 0.0.0.0;
     client_max_body_size 1024M;
-    access_log /var/log/nginx/nginx.vhost.access.log;
-    error_log /var/log/nginx/nginx.vhost.error.log;
 
     location / {
 	    root   /usr/src/app/frontend;
@@ -246,14 +245,13 @@ server {
 
     location /api2/ {
         root   /usr/src/app/backend;
-        index  index.html;
         include /etc/nginx/uwsgi_params;
         uwsgi_pass flask2;
 	}
 }
 ```
 
-![image](https://i.imgur.com/CwdzFU9.png)
+![image](https://i.imgur.com/2TlmN9i.png)
 
 ### 第六步: 新增 Dockerfile
 ```dockerfile
@@ -331,7 +329,7 @@ build_and_deploy_to_heroku:
     - docker push $HEROKU_REGISTRY:latest
     - docker run --rm -e HEROKU_API_KEY=$HEROKU_API_KEY dickeyxxx/heroku-cli heroku container:release web --app <heroku project name>
 ```
-https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
+關於 CI 變數 https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
 
 #### 我的版本
 ```yaml
@@ -377,8 +375,6 @@ upstream flask2 {
 server {
     listen $PORT default_server;
     client_max_body_size 1024M;
-    access_log /var/log/nginx/nginx.vhost.access.log;
-    error_log /var/log/nginx/nginx.vhost.error.log;
 
     location / {
 	    root   /usr/src/app/frontend;
@@ -400,7 +396,6 @@ server {
 
     location /api2/ {
         root   /usr/src/app/backend;
-        index  index.html;
         include /etc/nginx/uwsgi_params;
         uwsgi_pass flask2;
 	}
